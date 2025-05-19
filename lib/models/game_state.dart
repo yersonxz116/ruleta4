@@ -85,7 +85,13 @@ class GameState {
 
   // Obtener el usuario al que apunta el cañón
   User getTargetUser() {
-    return canonPosition == 0 ? user1 : user2;
+    // Si canonPosition es 0 (arriba), apunta a user2
+    // Si canonPosition es 1 (abajo), apunta a user1
+    if (canonPosition == 0) {
+      return user2;
+    } else {
+      return user1;
+    }
   }
 
   // Obtener el usuario que no está en la mira

@@ -147,166 +147,204 @@ class _GameScreenState extends State<GameScreen>
     showDialog(
       context: context,
       barrierDismissible: false,
-      builder:
-          (context) => StatefulBuilder(
-            builder:
-                (context, setDialogState) => AlertDialog(
-                  backgroundColor:
-                      gameOptions.isDarkMode ? Colors.grey[850] : null,
-                  title: Text(
-                    'Pregunta para ${targetUser.name}',
-                    style: TextStyle(
-                      color: gameOptions.isDarkMode ? Colors.white : null,
-                    ),
-                  ),
-                  content: Container(
-                    width: double.maxFinite,
-                    child: SingleChildScrollView(
-                      child: Column(
-                        mainAxisSize: MainAxisSize.min,
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                      Text(
-                        currentQuestion!.text,
-                        style: TextStyle(
-                          fontSize: 18,
-                          color: gameOptions.isDarkMode ? Colors.white : null,
-                        ),
-                      ),
-                      SizedBox(height: 20),
-                      ...List.generate(4, (index) {
-                        String option = String.fromCharCode(
-                          65 + index,
-                        ); // A, B, C, D
-                        return Padding(
-                          padding: const EdgeInsets.symmetric(vertical: 4.0),
-                          child: RadioListTile<int>(
-                            title: Text(
-                              '$option. ${currentQuestion!.options[index]}',
-                              style: TextStyle(
-                                color:
-                                    gameOptions.isDarkMode
-                                        ? Colors.white
-                                        : null,
-                              ),
-                            ),
-                            value: index,
-                            groupValue: selectedAnswer,
-                            onChanged:
-                                questionAnsweredCorrectly != null
-                                    ? null
-                                    : (value) {
-                                      setDialogState(() {
-                                        selectedAnswer = value;
-                                      });
-                                    },
-                            activeColor:
-                                gameOptions.isDarkMode
-                                    ? Colors.lightBlueAccent
-                                    : null,
-                          ),
-                        );
-                      }),
-                      if (questionAnsweredCorrectly != null)
-                        Padding(
-                          padding: const EdgeInsets.only(top: 16.0),
-                          child: questionAnsweredCorrectly!
-                            ? Text(
-                                '¡Respuesta correcta!',
-                                style: TextStyle(
-                                  color: Colors.green,
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 18,
-                                ),
-                              )
-                            : Container(
-                                padding: EdgeInsets.all(8.0),
-                                decoration: BoxDecoration(
-                                  shape: BoxShape.circle,
-                                  border: Border.all(color: Colors.black, width: 2),
-                                  color: Colors.yellow,
-                                ),
-                                child: Icon(
-                                  Icons.warning_amber_rounded,
-                                  color: Colors.black,
-                                  size: 28,
-                                ),
-                              ),
-                        ),
-                        ],
-                      ),
-                    ),
-                  ),
-                  actions: [
-                    if (questionAnsweredCorrectly == null)
-                      ElevatedButton(
-                        onPressed:
-                            selectedAnswer != null
-                                ? () {
-                                  // Verificar si la respuesta es correcta
-                                  bool isCorrect = currentQuestion!.isCorrect(
-                                    selectedAnswer!,
-                                  );
-
-                                  setDialogState(() {
-                                    questionAnsweredCorrectly = isCorrect;
-                                  });
-
-                                  // Si la respuesta es correcta, reproducir el sonido
-                                  if (isCorrect) {
-                                    _playCorrectAnswerSound();
-                                  }
-
-                                  // Esperar un momento para mostrar el resultado
-                                  Future.delayed(Duration(seconds: 1), () {
-                                    Navigator.of(context).pop();
-                                    setState(() {
-                                      showingQuestion = false;
-                                    });
-
-                                    // Decidir qué hacer según la respuesta
-                                    if (isCorrect) {
-                                      // Si responde correctamente, puede elegir disparar a sí mismo o al oponente
-                                      mostrarOpcionesDisparo(targetUser);
-                                    } else {
-                                      // Si responde incorrectamente, debe dispararse a sí mismo
-                                      dispararRevolver(targetUser: targetUser);
-                                    }
-                                  });
-                                }
-                                : null,
-                        child: Text('Responder'),
-                      ),
-                    if (questionAnsweredCorrectly != null)
-                      TextButton(
-                        onPressed: () {
-                          Navigator.of(context).pop();
-                          setState(() {
-                            showingQuestion = false;
-                          });
-
-                          // Decidir qué hacer según la respuesta
-                          if (questionAnsweredCorrectly!) {
-                            // Si responde correctamente, puede elegir disparar a sí mismo o al oponente
-                            mostrarOpcionesDisparo(targetUser);
-                          } else {
-                            // Si responde incorrectamente, debe dispararse a sí mismo
-                            dispararRevolver(targetUser: targetUser);
-                          }
-                        },
-                        child: Text(
-                          'Continuar',
-                          style: TextStyle(
-                            color:
-                                gameOptions.isDarkMode
-                                    ? Colors.lightBlueAccent
-                                    : null,
-                          ),
-                        ),
-                      ),
-                  ],
-                ),
+      builder: (context) => StatefulBuilder(
+        builder: (context, setDialogState) => AlertDialog(
+          backgroundColor: Colors.brown[900],
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(15),
+            side: BorderSide(color: Colors.brown[700]!, width: 3),
           ),
+          title: Container(
+            padding: EdgeInsets.all(8),
+            decoration: BoxDecoration(
+              border: Border(bottom: BorderSide(color: Colors.brown[700]!, width: 2)),
+              gradient: LinearGradient(
+                colors: [Colors.brown[800]!, Colors.brown[900]!],
+                begin: Alignment.topCenter,
+                end: Alignment.bottomCenter,
+              ),
+            ),
+            child: Text(
+              'Pregunta para ${targetUser.name}',
+              style: TextStyle(
+                color: Colors.amber[100],
+                fontSize: 22,
+                fontWeight: FontWeight.bold,
+              ),
+              textAlign: TextAlign.center,
+            ),
+          ),
+          content: Container(
+            width: double.maxFinite,
+            decoration: BoxDecoration(
+              gradient: RadialGradient(
+                colors: [Colors.brown[800]!, Colors.brown[900]!],
+                center: Alignment.center,
+                radius: 1.2,
+              ),
+            ),
+            child: SingleChildScrollView(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Container(
+                    padding: EdgeInsets.all(12),
+                    margin: EdgeInsets.only(bottom: 16),
+                    decoration: BoxDecoration(
+                      color: Colors.brown[800],
+                      borderRadius: BorderRadius.circular(10),
+                      border: Border.all(color: Colors.brown[600]!, width: 2),
+                    ),
+                    child: Text(
+                      currentQuestion!.text,
+                      style: TextStyle(
+                        fontSize: 18,
+                        color: Colors.amber[100],
+                      ),
+                    ),
+                  ),
+                  ...List.generate(4, (index) {
+                    String option = String.fromCharCode(65 + index); // A, B, C, D
+                    return Container(
+                      margin: EdgeInsets.only(bottom: 8),
+                      decoration: BoxDecoration(
+                        color: selectedAnswer == index ? Colors.brown[600] : Colors.brown[700],
+                        borderRadius: BorderRadius.circular(8),
+                        border: Border.all(color: Colors.brown[500]!, width: 1),
+                      ),
+                      child: RadioListTile<int>(
+                        title: Text(
+                          '$option. ${currentQuestion!.options[index]}',
+                          style: TextStyle(
+                            color: Colors.amber[100],
+                          ),
+                        ),
+                        value: index,
+                        groupValue: selectedAnswer,
+                        onChanged: questionAnsweredCorrectly != null
+                            ? null
+                            : (value) {
+                                setDialogState(() {
+                                  selectedAnswer = value;
+                                });
+                              },
+                        activeColor: Colors.amber,
+                      ),
+                    );
+                  }),
+                ],
+              ),
+            ),
+          ),
+          actions: [
+            Container(
+              padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+              decoration: BoxDecoration(
+                border: Border(top: BorderSide(color: Colors.brown[700]!, width: 2)),
+              ),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  if (questionAnsweredCorrectly == null)
+                    ElevatedButton(
+                      onPressed: selectedAnswer != null
+                          ? () {
+                              bool isCorrect = currentQuestion!.isCorrect(selectedAnswer!);
+                              setDialogState(() {
+                                questionAnsweredCorrectly = isCorrect;
+                              });
+                              if (isCorrect) {
+                                _playCorrectAnswerSound();
+                              } else {
+                                // Mostrar alerta de respuesta incorrecta
+                                showDialog(
+                                  context: context,
+                                  barrierDismissible: false,
+                                  builder: (context) => AlertDialog(
+                                    backgroundColor: Colors.red[900],
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(15),
+                                      side: BorderSide(color: Colors.red[700]!, width: 3),
+                                    ),
+                                    title: Text(
+                                      '¡${targetUser.name}!',
+                                      style: TextStyle(
+                                        color: Colors.white,
+                                        fontSize: 24,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                      textAlign: TextAlign.center,
+                                    ),
+                                    content: Text(
+                                      'RESPUESTA INCORRECTA',
+                                      style: TextStyle(
+                                        color: Colors.white,
+                                        fontSize: 20,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                      textAlign: TextAlign.center,
+                                    ),
+                                    actions: [
+                                      TextButton(
+                                        onPressed: () {
+                                          Navigator.of(context).pop();
+                                          Navigator.of(context).pop();
+                                          setState(() {
+                                            showingQuestion = false;
+                                          });
+                                          dispararRevolver(targetUser: targetUser);
+                                        },
+                                        child: Text(
+                                          'Aceptar',
+                                          style: TextStyle(color: Colors.white),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                );
+                              }
+                              Future.delayed(Duration(seconds: 1), () {
+                                if (isCorrect) {
+                                  Navigator.of(context).pop();
+                                  setState(() {
+                                    showingQuestion = false;
+                                  });
+                                  mostrarOpcionesDisparo(targetUser);
+                                }
+                              });
+                            }
+                          : null,
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.brown[600],
+                        foregroundColor: Colors.amber[100],
+                      ),
+                      child: Text('Responder'),
+                    ),
+                  if (questionAnsweredCorrectly != null)
+                    TextButton(
+                      onPressed: () {
+                        Navigator.of(context).pop();
+                        setState(() {
+                          showingQuestion = false;
+                        });
+                        if (questionAnsweredCorrectly!) {
+                          mostrarOpcionesDisparo(targetUser);
+                        } else {
+                          dispararRevolver(targetUser: targetUser);
+                        }
+                      },
+                      style: TextButton.styleFrom(
+                        foregroundColor: Colors.amber[100],
+                      ),
+                      child: Text('Continuar'),
+                    ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
     );
   }
 
@@ -316,44 +354,135 @@ class _GameScreenState extends State<GameScreen>
     showDialog(
       context: context,
       barrierDismissible: false,
-      builder:
-          (context) => AlertDialog(
-            backgroundColor: gameOptions.isDarkMode ? Colors.grey[850] : null,
-            title: Text(
-              '¡Respuesta correcta!',
-              style: TextStyle(
-                color: gameOptions.isDarkMode ? Colors.white : null,
-              ),
+      builder: (context) => AlertDialog(
+        backgroundColor: Colors.brown[900],
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(15),
+          side: BorderSide(color: Colors.brown[700]!, width: 3),
+        ),
+        title: Container(
+          padding: EdgeInsets.all(8),
+          decoration: BoxDecoration(
+            border: Border(bottom: BorderSide(color: Colors.brown[700]!, width: 2)),
+            gradient: LinearGradient(
+              colors: [Colors.brown[800]!, Colors.brown[900]!],
+              begin: Alignment.topCenter,
+              end: Alignment.bottomCenter,
             ),
-            content: SingleChildScrollView(
-              child: Text(
+          ),
+          child: Text(
+            '¡Respuesta correcta!',
+            style: TextStyle(
+              color: Colors.amber[100],
+              fontSize: 24,
+              fontWeight: FontWeight.bold,
+            ),
+            textAlign: TextAlign.center,
+          ),
+        ),
+        content: Container(
+          padding: EdgeInsets.all(16),
+          decoration: BoxDecoration(
+            gradient: RadialGradient(
+              colors: [Colors.brown[800]!, Colors.brown[900]!],
+              center: Alignment.center,
+              radius: 1.2,
+            ),
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(
                 '${targetUser.name}, puedes elegir a quién disparar:',
                 style: TextStyle(
-                  color: gameOptions.isDarkMode ? Colors.white : null,
+                  color: Colors.amber[100],
+                  fontSize: 18,
+                ),
+                textAlign: TextAlign.center,
+              ),
+              SizedBox(height: 20),
+              Container(
+                width: double.infinity,
+                margin: EdgeInsets.symmetric(vertical: 8),
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    colors: [Colors.orange[700]!, Colors.orange[900]!],
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                  ),
+                  borderRadius: BorderRadius.circular(10),
+                  border: Border.all(color: Colors.orange[800]!, width: 2),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.3),
+                      spreadRadius: 1,
+                      blurRadius: 3,
+                      offset: Offset(0, 2),
+                    ),
+                  ],
+                ),
+                child: TextButton(
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                    dispararRevolver(targetUser: targetUser);
+                  },
+                  style: TextButton.styleFrom(
+                    padding: EdgeInsets.symmetric(vertical: 12),
+                    backgroundColor: Colors.transparent,
+                  ),
+                  child: Text(
+                    'Disparar a mí mismo',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
                 ),
               ),
-            ),
-            actions: [
-              ElevatedButton(
-                onPressed: () {
-                  Navigator.of(context).pop();
-                  // Disparar a sí mismo
-                  dispararRevolver(targetUser: targetUser);
-                },
-                child: Text('Disparar a mí mismo'),
-                style: ElevatedButton.styleFrom(backgroundColor: Colors.orange),
-              ),
-              ElevatedButton(
-                onPressed: () {
-                  Navigator.of(context).pop();
-                  // Disparar al oponente
-                  dispararRevolver(targetUser: otherUser);
-                },
-                child: Text('Disparar a ${otherUser.name}'),
-                style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
+              Container(
+                width: double.infinity,
+                margin: EdgeInsets.symmetric(vertical: 8),
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    colors: [Colors.red[700]!, Colors.red[900]!],
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                  ),
+                  borderRadius: BorderRadius.circular(10),
+                  border: Border.all(color: Colors.red[800]!, width: 2),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.3),
+                      spreadRadius: 1,
+                      blurRadius: 3,
+                      offset: Offset(0, 2),
+                    ),
+                  ],
+                ),
+                child: TextButton(
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                    dispararRevolver(targetUser: otherUser);
+                  },
+                  style: TextButton.styleFrom(
+                    padding: EdgeInsets.symmetric(vertical: 12),
+                    backgroundColor: Colors.transparent,
+                  ),
+                  child: Text(
+                    'Disparar a ${otherUser.name}',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
               ),
             ],
           ),
+        ),
+      ),
     );
   }
 
@@ -409,11 +538,12 @@ class _GameScreenState extends State<GameScreen>
       barrierDismissible: false,
       builder:
           (context) => AlertDialog(
-            backgroundColor: gameOptions.isDarkMode ? Colors.grey[850] : null,
+            backgroundColor: gameOptions.isDarkMode ? Colors.grey[850] : Colors.brown[900],
             title: Text(
               '¡Fin del juego!',
               style: TextStyle(
-                color: gameOptions.isDarkMode ? Colors.white : null,
+                color: gameOptions.isDarkMode ? Colors.white : Colors.amber[900],
+                fontWeight: FontWeight.bold,
               ),
             ),
             content: SingleChildScrollView(
@@ -423,27 +553,29 @@ class _GameScreenState extends State<GameScreen>
                 Text(
                   '¡${winner.name} ha ganado!',
                   style: TextStyle(
-                    color: gameOptions.isDarkMode ? Colors.white : null,
+                    color: gameOptions.isDarkMode ? Colors.white : Colors.amber[900],
+                    fontSize: 18,
                   ),
                 ),
                 SizedBox(height: 20),
                 Text(
                   'Estadísticas:',
                   style: TextStyle(
-                    color: gameOptions.isDarkMode ? Colors.white : null,
+                    color: gameOptions.isDarkMode ? Colors.white : Colors.amber[900],
+                    decoration: TextDecoration.underline,
                   ),
                 ),
                 SizedBox(height: 10),
                 Text(
                   '${widget.user1.name}: ${widget.user1.wins} victorias, ${widget.user1.losses} derrotas',
                   style: TextStyle(
-                    color: gameOptions.isDarkMode ? Colors.white : null,
+                    color: gameOptions.isDarkMode ? Colors.white : Colors.amber[900],
                   ),
                 ),
                 Text(
                   '${widget.user2.name}: ${widget.user2.wins} victorias, ${widget.user2.losses} derrotas',
                   style: TextStyle(
-                    color: gameOptions.isDarkMode ? Colors.white : null,
+                    color: gameOptions.isDarkMode ? Colors.white : Colors.amber[900],
                   ),
                 ),
                 ],
@@ -458,8 +590,9 @@ class _GameScreenState extends State<GameScreen>
                 child: Text(
                   'Volver al menú',
                   style: TextStyle(
-                    color:
-                        gameOptions.isDarkMode ? Colors.lightBlueAccent : null,
+                    color: gameOptions.isDarkMode 
+                        ? Colors.lightBlueAccent 
+                        : Colors.amber[900],
                   ),
                 ),
               ),
@@ -468,7 +601,6 @@ class _GameScreenState extends State<GameScreen>
                   Navigator.of(context).pop();
                   // Reiniciar el juego
                   setState(() {
-                    // Asegurar que ambos jugadores tengan exactamente 2 vidas
                     widget.user1.lives = 2;
                     widget.user2.lives = 2;
                     gameState = GameState(
@@ -478,7 +610,17 @@ class _GameScreenState extends State<GameScreen>
                     gameState.initChamber(widget.bullets);
                   });
                 },
-                child: Text('Jugar de nuevo'),
+                child: Text(
+                  'Jugar de nuevo',
+                  style: TextStyle(
+                    color: gameOptions.isDarkMode ? null : Colors.brown[700],
+                  ),
+                ),
+                style: gameOptions.isDarkMode 
+                    ? null
+                    : ElevatedButton.styleFrom(
+                        backgroundColor: Colors.amber[600],
+                      ),
               ),
             ],
           ),
@@ -492,8 +634,8 @@ class _GameScreenState extends State<GameScreen>
 
     return Scaffold(
       appBar: AppBar(
-        title: Text('Ruleta Rusa con Preguntas'),
-        backgroundColor: gameOptions.isDarkMode ? Colors.black54 : null,
+        backgroundColor: Colors.brown[900],
+        elevation: 0,
         actions: [
           // Mantener los botones de perfil originales
           IconButton(
@@ -523,10 +665,14 @@ class _GameScreenState extends State<GameScreen>
         ],
       ),
       // Aplicar el color de fondo según el modo oscuro
-      backgroundColor: gameOptions.isDarkMode ? Colors.grey[900] : Colors.brown[800],
+      backgroundColor: Colors.brown[900],
       body: Container(
         decoration: BoxDecoration(
-          // Fondo de madera
+          gradient: LinearGradient(
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+            colors: [Colors.brown[800]!, Colors.brown[900]!],
+          ),
           image: DecorationImage(
             image: AssetImage('assets/img/madera.png'),
             fit: BoxFit.cover,

@@ -5,6 +5,7 @@ import 'models/game_options.dart';
 import 'screens/game_screen.dart';
 import 'screens/user_profile_screen.dart';
 import 'screens/options_screen.dart';
+import 'screens/name_input_screen.dart';
 
 void main() {
   runApp(MyApp());
@@ -167,17 +168,20 @@ class _MenuScreenState extends State<MenuScreen> {
               //     ],
               //   ),
               // ),
-              SizedBox(height: 40),
-              Image.asset(
-                'assets/img/logo.png',
-                width: 300,
-                height: 300,
-              ),
-              SizedBox(height: 60),
+              
               WoodenButton(
   text: 'JUGAR',
   onPressed: () {
-    _showBulletsDialog(context);
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) => NameInputScreen(
+        user1: user1,
+        user2: user2,
+      ),
+    ).then((_) {
+      _showBulletsDialog(context);
+    });
   },
 ),
 SizedBox(height: 20),
@@ -193,40 +197,7 @@ WoodenButton(
 ),
 
               SizedBox(height: 20),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  ElevatedButton(
-                    onPressed: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => UserProfileScreen(user: user1),
-                        ),
-                      );
-                    },
-                    child: Text('Perfil Usuario 1'),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.grey[800],
-                    ),
-                  ),
-                  SizedBox(width: 20),
-                  ElevatedButton(
-                    onPressed: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => UserProfileScreen(user: user2),
-                        ),
-                      );
-                    },
-                    child: Text('Perfil Usuario 2'),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.grey[800],
-                    ),
-                  ),
-                ],
-              ),
+              
             ],
           ),
         ),
@@ -239,77 +210,121 @@ WoodenButton(
 
     showDialog(
       context: context,
-      builder: (BuildContext context) {
-        return StatefulBuilder(
-          builder: (context, setState) {
-            return AlertDialog(
-              backgroundColor: gameOptions.isDarkMode ? Colors.grey[850] : null,
-              title: Text(
-                'Selecciona la cantidad de balas',
-                style: TextStyle(
-                  color: gameOptions.isDarkMode ? Colors.white : null,
-                ),
+      barrierDismissible: false,
+      builder: (context) => AlertDialog(
+        backgroundColor: Colors.brown[900],
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(15),
+          side: BorderSide(color: Colors.brown[700]!, width: 3),
+        ),
+        title: Container(
+          padding: EdgeInsets.all(8),
+          decoration: BoxDecoration(
+            border: Border(bottom: BorderSide(color: Colors.brown[700]!, width: 2)),
+            gradient: LinearGradient(
+              colors: [Colors.brown[800]!, Colors.brown[900]!],
+              begin: Alignment.topCenter,
+              end: Alignment.bottomCenter,
+            ),
+          ),
+          child: Text(
+            'SELECCIONA LAS BALAS',
+            style: TextStyle(
+              color: Colors.amber[100],
+              fontSize: 22,
+              fontWeight: FontWeight.bold,
+            ),
+            textAlign: TextAlign.center,
+          ),
+        ),
+        content: StatefulBuilder(
+          builder: (context, setState) => Container(
+            padding: EdgeInsets.symmetric(vertical: 20, horizontal: 10),
+            decoration: BoxDecoration(
+              gradient: RadialGradient(
+                colors: [Colors.brown[800]!, Colors.brown[900]!],
+                center: Alignment.center,
+                radius: 1.2,
               ),
-              content: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Text(
-                    'Número de balas: $selectedBullets',
-                    style: TextStyle(
-                      color: gameOptions.isDarkMode ? Colors.white : null,
-                    ),
+            ),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  'Número de balas: $selectedBullets',
+                  style: TextStyle(
+                    color: Colors.amber[100],
+                    fontSize: 18,
                   ),
-                  Slider(
+                ),
+                SizedBox(height: 20),
+                SliderTheme(
+                  data: SliderThemeData(
+                    activeTrackColor: Colors.amber[600],
+                    inactiveTrackColor: Colors.brown[600],
+                    thumbColor: Colors.amber,
+                    overlayColor: Colors.amber.withOpacity(0.3),
+                    valueIndicatorColor: Colors.amber[700],
+                    valueIndicatorTextStyle: TextStyle(color: Colors.white),
+                  ),
+                  child: Slider(
                     value: selectedBullets.toDouble(),
                     min: 1,
                     max: 5,
                     divisions: 4,
                     label: selectedBullets.toString(),
-                    onChanged: (double value) {
+                    onChanged: (value) {
                       setState(() {
-                        selectedBullets = value.toInt();
+                        selectedBullets = value.round();
                       });
                     },
                   ),
-                ],
-              ),
-              actions: [
-                TextButton(
-                  onPressed: () {
-                    Navigator.of(context).pop();
-                  },
-                  child: Text(
-                    'Cancelar',
-                    style: TextStyle(
-                      color:
-                          gameOptions.isDarkMode
-                              ? Colors.lightBlueAccent
-                              : null,
+                ),
+              ],
+            ),
+          ),
+        ),
+        actions: [
+          Container(
+            padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+            decoration: BoxDecoration(
+              border: Border(top: BorderSide(color: Colors.brown[700]!, width: 2)),
+            ),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: [
+                ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.brown[600],
+                    foregroundColor: Colors.amber[100],
+                    padding: EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(8),
                     ),
                   ),
-                ),
-                ElevatedButton(
                   onPressed: () {
                     Navigator.of(context).pop();
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder:
-                            (context) => GameScreen(
-                              user1: user1,
-                              user2: user2,
-                              bullets: selectedBullets,
-                            ),
+                        builder: (context) => GameScreen(
+                          user1: user1,
+                          user2: user2,
+                          bullets: selectedBullets,
+                        ),
                       ),
                     );
                   },
-                  child: Text('Comenzar'),
+                  child: Text(
+                    'CONFIRMAR',
+                    style: TextStyle(fontWeight: FontWeight.bold),
+                  ),
                 ),
               ],
-            );
-          },
-        );
-      },
+            ),
+          ),
+        ],
+      ),
     );
   }
 }

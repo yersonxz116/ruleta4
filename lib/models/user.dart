@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 
 class User {
   final String id;
-  final String name;
+  String name;
   int wins;
   int losses;
   String? avatarUrl;
